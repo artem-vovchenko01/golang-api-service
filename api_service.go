@@ -22,8 +22,15 @@ func main() {
 		repository: NewInMemoryUserStorage(),
 	}
 
+
+	jwtService, err := NewJWTService("privkey.rsa", "pubkey.rsa")
+	if err != nil {
+		panic(err)
+	}
+
 	r.HandleFunc("/cake", logRequest(getCakeHandler)).Methods(http.MethodGet)
 	r.HandleFunc("/user/register", logRequest(userService.Register)).Methods(http.MethodPost)
+	r.HandleFunc("/user/jwt", logRequest(wrapJWT(jwtService, userService.JWT))).Methods(http.MethodPost)
 	srv := http.Server {
 		Addr: 		":8080",
 		Handler: 	r,
@@ -39,10 +46,20 @@ func main() {
 	}()
 
 	log.Println("Server started, hbit Ctrl+C to stop")
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Println("Server exited with error", err)
 	}
 
 	log.Println("Good bye :)")
 }
+
+func wrapJWT(
+	jwt *JWTService,
+	f func(http.ResponseWriter, *http.Request, *JWTService),
+) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		f(rw, r, jwt)
+	}
+}
+
