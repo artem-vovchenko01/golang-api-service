@@ -8,27 +8,28 @@ import (
 	"os/signal"
 	"time"
 	"github.com/gorilla/mux"
+	"strings"
 )
 
-func getCakeHandler(w http.ResponseWriter, r *http.Request) {
+func getCakeHandler(w http.ResponseWriter, r *http.Request, u User) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("cake"))
+	w.Write([]byte(u.FavoriteCake))
 }
 
 func main() {
 	r := mux.NewRouter()
 
+	users := NewInMemoryUserStorage()
 	userService := UserService {
-		repository: NewInMemoryUserStorage(),
+		repository: users,
 	}
-
 
 	jwtService, err := NewJWTService("privkey.rsa", "pubkey.rsa")
 	if err != nil {
 		panic(err)
 	}
 
-	r.HandleFunc("/cake", logRequest(getCakeHandler)).Methods(http.MethodGet)
+	r.HandleFunc("/cake", logRequest(jwtService.jwtAuth(users, getCakeHandler))).Methods(http.MethodGet)
 	r.HandleFunc("/user/register", logRequest(userService.Register)).Methods(http.MethodPost)
 	r.HandleFunc("/user/jwt", logRequest(wrapJWT(jwtService, userService.JWT))).Methods(http.MethodPost)
 	srv := http.Server {
@@ -63,3 +64,29 @@ func wrapJWT(
 	}
 }
 
+type ProtectedHandler func(rw http.ResponseWriter, r *http.Request, u User) 
+
+func (j *JWTService) jwtAuth(
+	users UserRepository,
+	h ProtectedHandler,
+) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		token := strings.TrimPrefix(authHeader, "Bearer ")
+		auth, err := j.ParseJWT(token)
+		if err != nil {
+			rw.WriteHeader(401)
+			rw.Write([]byte("unathorized"))
+			return
+		}
+
+		user, err := users.Get(auth.Email)
+		if err != nil {
+			rw.WriteHeader(401)
+			rw.Write([]byte("unathorized"))
+			return
+		}
+
+		h(rw, r, user)
+	}
+}

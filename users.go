@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"crypto/md5"
+	"fmt"
 )
 
 type UserService struct {
@@ -12,9 +13,9 @@ type UserService struct {
 }
 
 type UserRegisterParams struct {
-	Email			string `json: "email"`
-	Password		string `json: "password"`
-	FavoriteCake 	string `json" "favorite_cake"`
+	Email			string `json:"email"`
+	Password		string `json:"password"`
+	FavoriteCake 	string `json:"favorite_cake"`
 }
 
 func ValidateRegisterParams(p *UserRegisterParams) error {
@@ -36,10 +37,13 @@ func (u *UserService) Register(w http.ResponseWriter, r *http.Request) {
 	}
 	passwordDigest := md5.New().Sum([]byte(params.Password))
 	newUser := User {
-		login: 	params.Email,
+		Email: 	params.Email,
 		PasswordDigest: string(passwordDigest),
 		FavoriteCake: params.FavoriteCake,
 	}
+
+	fmt.Println("cake: ", newUser.FavoriteCake)
+	fmt.Println("email: ", newUser.Email)
 
 	err = u.repository.Add(params.Email, newUser)
 	if err != nil {
@@ -60,7 +64,6 @@ type User struct {
 	Email			string
 	PasswordDigest	string
 	FavoriteCake	string
-	login			string
 }
 
 type UserRepository interface {
