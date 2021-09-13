@@ -1,11 +1,11 @@
 package main
 
 import (
-	"net/http"
+	"crypto/md5"
 	"encoding/json"
 	"errors"
-	"crypto/md5"
 	"fmt"
+	"net/http"
 )
 
 type UserService struct {
@@ -13,9 +13,9 @@ type UserService struct {
 }
 
 type UserRegisterParams struct {
-	Email			string `json:"email"`
-	Password		string `json:"password"`
-	FavoriteCake 	string `json:"favorite_cake"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	FavoriteCake string `json:"favorite_cake"`
 }
 
 func ValidateRegisterParams(p *UserRegisterParams) error {
@@ -24,7 +24,7 @@ func ValidateRegisterParams(p *UserRegisterParams) error {
 }
 
 func (u *UserService) Register(w http.ResponseWriter, r *http.Request) {
-	params := &UserRegisterParams {}
+	params := &UserRegisterParams{}
 	err := json.NewDecoder(r.Body).Decode(params)
 	if err != nil {
 		handleError(errors.New("could not read params"), w)
@@ -36,10 +36,10 @@ func (u *UserService) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	passwordDigest := md5.New().Sum([]byte(params.Password))
-	newUser := User {
-		Email: 	params.Email,
+	newUser := User{
+		Email:          params.Email,
 		PasswordDigest: string(passwordDigest),
-		FavoriteCake: params.FavoriteCake,
+		FavoriteCake:   params.FavoriteCake,
 	}
 
 	fmt.Println("cake: ", newUser.FavoriteCake)
@@ -61,9 +61,9 @@ func handleError(err error, w http.ResponseWriter) {
 }
 
 type User struct {
-	Email			string
-	PasswordDigest	string
-	FavoriteCake	string
+	Email          string
+	PasswordDigest string
+	FavoriteCake   string
 }
 
 type UserRepository interface {

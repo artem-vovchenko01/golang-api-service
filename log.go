@@ -1,18 +1,18 @@
 package main
 
 import (
-	"net/http"
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"time"
-	"errors"
 )
 
 type logWriter struct {
 	http.ResponseWriter
 	statusCode int
-	response bytes.Buffer
+	response   bytes.Buffer
 }
 
 func (w *logWriter) WriteHeader(status int) {

@@ -31,8 +31,8 @@ func (j *JWTService) ParseJWT(jwt string) (auth.Auth, error) {
 }
 
 type JWTParams struct {
-	Email 		string `json:"email"`
-	Password	string `json:"password"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (u *UserService) JWT(
@@ -52,7 +52,7 @@ func (u *UserService) JWT(
 	user, err := u.repository.Get(params.Email)
 	if err != nil {
 		handleError(err, w)
-		return 
+		return
 	}
 
 	if string(passwordDigest) != user.PasswordDigest {

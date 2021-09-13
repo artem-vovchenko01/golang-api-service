@@ -10,8 +10,8 @@ import (
 )
 
 type parsedResponse struct {
-	status 	int
-	body 	[]byte
+	status int
+	body   []byte
 }
 
 func createRequester(t *testing.T) func(req *http.Request, err error) parsedResponse {
@@ -67,7 +67,7 @@ func assertBody(t *testing.T, expected string, r parsedResponse) {
 
 func TestUsers_JWT(t *testing.T) {
 	doRequest := createRequester(t)
-	t.Run("user does not exist", func (t *testing.T) {
+	t.Run("user does not exist", func(t *testing.T) {
 		u := newTestUserService()
 		j, err := NewJWTService("privkey.rsa", "pubkey.rsa")
 		if err != nil {
@@ -77,9 +77,9 @@ func TestUsers_JWT(t *testing.T) {
 		ts := httptest.NewServer(http.HandlerFunc(wrapJWT(j, u.JWT)))
 		defer ts.Close()
 
-		params := map[string]interface{} {
-			"email" : "test@mail.com",
-			"password" : "somepass",
+		params := map[string]interface{}{
+			"email":    "test@mail.com",
+			"password": "somepass",
 		}
 
 		resp := doRequest(http.NewRequest(http.MethodPost, ts.URL, prepareParams(t, params)))

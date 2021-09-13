@@ -6,13 +6,13 @@ import (
 )
 
 type InMemoryUserStorage struct {
-	lock	sync.RWMutex
-	storage	map[string]User
+	lock    sync.RWMutex
+	storage map[string]User
 }
 
 func NewInMemoryUserStorage() *InMemoryUserStorage {
-	return &InMemoryUserStorage {
-		lock: sync.RWMutex {},
+	return &InMemoryUserStorage{
+		lock:    sync.RWMutex{},
 		storage: make(map[string]User),
 	}
 }
@@ -34,7 +34,7 @@ func (memStore *InMemoryUserStorage) Update(login string, user User) error {
 	memStore.lock.RLock()
 	_, ok := memStore.storage[login]
 	memStore.lock.RUnlock()
-	if ! ok {
+	if !ok {
 		return errors.New("User with such login doesn't exist")
 	}
 
@@ -48,7 +48,7 @@ func (memStore *InMemoryUserStorage) Delete(login string) (User, error) {
 	memStore.lock.RLock()
 	usr, ok := memStore.storage[login]
 	memStore.lock.RUnlock()
-	if ! ok {
+	if !ok {
 		return User{}, errors.New("There is no such user")
 	}
 
@@ -60,7 +60,7 @@ func (memStore *InMemoryUserStorage) Get(login string) (User, error) {
 	memStore.lock.RLock()
 	usr, ok := memStore.storage[login]
 	memStore.lock.RUnlock()
-	if ! ok {
+	if !ok {
 		return User{}, errors.New("There is no such user")
 	}
 
