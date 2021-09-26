@@ -53,6 +53,7 @@ func (u *UserService) Register(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("registered"))
+	UserRegisteredCounter.Inc()
 }
 
 func handleError(err error, w http.ResponseWriter) {
@@ -64,6 +65,7 @@ type User struct {
 	Email          string
 	PasswordDigest string
 	FavoriteCake   string
+	Role		string
 }
 
 type UserRepository interface {

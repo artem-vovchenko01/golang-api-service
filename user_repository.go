@@ -61,7 +61,7 @@ func (memStore *InMemoryUserStorage) Get(login string) (User, error) {
 	usr, ok := memStore.storage[login]
 	memStore.lock.RUnlock()
 	if !ok {
-		return User{}, errors.New("There is no such user")
+		return User{}, errors.New("invalid login params")
 	}
 
 	return usr, nil

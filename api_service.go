@@ -14,9 +14,11 @@ import (
 func getCakeHandler(w http.ResponseWriter, r *http.Request, u User) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(u.FavoriteCake))
+	CakesGiven.Inc()
 }
 
 func main() {
+	go AddPrometheusMetrics()
 	r := mux.NewRouter()
 
 	users := NewInMemoryUserStorage()
@@ -29,7 +31,7 @@ func main() {
 		panic(err)
 	}
 
-	r.HandleFunc("/cake", logRequest(jwtService.jwtAuth(users, getCakeHandler))).Methods(http.MethodGet)
+	r.HandleFunc("/user/me", logRequest(jwtService.jwtAuth(users, getCakeHandler))).Methods(http.MethodGet)
 	r.HandleFunc("/user/register", logRequest(userService.Register)).Methods(http.MethodPost)
 	r.HandleFunc("/user/jwt", logRequest(wrapJWT(jwtService, userService.JWT))).Methods(http.MethodPost)
 	srv := http.Server{
@@ -54,6 +56,7 @@ func main() {
 
 	log.Println("Good bye :)")
 }
+
 
 func wrapJWT(
 	jwt *JWTService,
@@ -90,3 +93,4 @@ func (j *JWTService) jwtAuth(
 		h(rw, r, user)
 	}
 }
+
