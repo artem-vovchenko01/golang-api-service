@@ -57,7 +57,6 @@ func main() {
 	log.Println("Good bye :)")
 }
 
-
 func wrapJWT(
 	jwt *JWTService,
 	f func(http.ResponseWriter, *http.Request, *JWTService),
@@ -93,4 +92,3 @@ func (j *JWTService) jwtAuth(
 		h(rw, r, user)
 	}
 }
-

@@ -65,7 +65,7 @@ type User struct {
 	Email          string
 	PasswordDigest string
 	FavoriteCake   string
-	Role		string
+	Role           string
 }
 
 type UserRepository interface {
