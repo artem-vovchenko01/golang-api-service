@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"strconv"
 )
 
 type logWriter struct {
@@ -54,5 +55,7 @@ func logRequest(h http.HandlerFunc) http.HandlerFunc {
 			string(body),
 			writer.response.String(),
 		)
+
+		ResponseTimeHistogram.WithLabelValues(r.URL.Path, r.Method, strconv.Itoa(writer.statusCode)).Observe(float64(done.Seconds()))
 	}
 }
